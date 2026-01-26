@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 400px;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      color: #1a1a1a;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 16px;
+      margin: 0 0 16px 0;
+      font-weight: 600;
+    }
+
+    .profile-info {
+      background: #f5f5f5;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    .profile-info p {
+      margin: 4px 0;
+      font-size: 13px;
+    }
+
+    .profile-info strong {
+      color: #666;
+    }
+
+    .settings {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    input[type="password"], input[type="text"], select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #0a66c2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+
+    button:hover {
+      background: #004182;
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    button.secondary {
+      background: #666;
+    }
+
+    button.secondary:hover {
+      background: #444;
+    }
+
+    .output {
+      width: 100%;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 12px;
+      min-height: 100px;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-size: 13px;
+      line-height: 1.5;
+      font-family: inherit;
+      resize: vertical;
+    }
+
+    .output.placeholder {
+      color: #999;
+    }
+
+    .error {
+      color: #d93025;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .success {
+      color: #188038;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .api-key-status {
+      font-size: 12px;
+      color: #188038;
+    }
+
+    .link-btn {
+      background: none;
+      border: none;
+      color: #0a66c2;
+      font-size: 12px;
+      cursor: pointer;
+      padding: 0;
+      margin-left: 8px;
+      text-decoration: underline;
+      width: auto;
+    }
+
+    .link-btn:hover {
+      color: #004182;
+    }
+
+    #apiKeySet {
+      margin-bottom: 12px;
+    }
+
+    .char-count {
+      font-size: 11px;
+      color: #666;
+      text-align: right;
+      margin-top: 4px;
+      margin-bottom: 8px;
+    }
+
+    .char-count.over {
+      color: #d93025;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <h1>v0 LinkedIn DM Writer</h1>
+
+  <div class="settings">
+    <div id="apiKeySection">
+      <label>Vercel AI Gateway Key (stored locally)</label>
+      <input type="password" id="apiKey" placeholder="vck_...">
+    </div>
+    <div id="apiKeySet" class="hidden">
+      <span class="api-key-status">API key saved</span>
+      <button type="button" id="changeKeyBtn" class="link-btn">change</button>
+    </div>
+
+    <label>Persona</label>
+    <select id="persona">
+      <option value="sales_leader">Sales Leader</option>
+      <option value="marketing_leader">Marketing Leader</option>
+      <option value="engineering_leader">Engineering Leader</option>
+      <option value="design_leader">Design Leader</option>
+      <option value="data_leader">Data/Ops Leader</option>
+      <option value="security_leader">Security/CISO</option>
+    </select>
+
+    <label>Format</label>
+    <select id="format">
+      <option value="dm">LinkedIn DM (under 280 chars)</option>
+      <option value="email">Cold Email (under 100 words)</option>
+    </select>
+
+    <label>Add this (optional)</label>
+    <input type="text" id="addThis" placeholder="e.g. they just posted about hiring, mutual connection with John">
+  </div>
+
+  <div class="profile-info" id="profileInfo">
+    <p><strong>Name:</strong> <span id="profileName">Loading...</span></p>
+    <p><strong>Title:</strong> <span id="profileTitle">Loading...</span></p>
+    <p><strong>Company:</strong> <span id="profileCompany">Loading...</span></p>
+  </div>
+
+  <button id="generateBtn">Generate</button>
+
+  <textarea class="output placeholder" id="output" placeholder="Your personalized DM will appear here..."></textarea>
+  <div class="char-count" id="charCount"></div>
+
+  <button id="copyBtn" class="secondary hidden">Copy to Clipboard</button>
+
+  <div id="message"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

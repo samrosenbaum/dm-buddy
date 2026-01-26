@@ -1,0 +1,287 @@
+/* v0 DM Writer - Injected Styles */
+
+.v0-dm-btn {
+  background: #0a66c2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: background 0.2s;
+}
+
+.v0-dm-btn:hover {
+  background: #004182;
+}
+
+.v0-dm-btn.loading {
+  background: #666;
+  cursor: wait;
+}
+
+.v0-dm-btn.done {
+  background: #057642;
+}
+
+/* Floating action bar for batch operations */
+.v0-action-bar {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  background: white !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+  padding: 12px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  z-index: 2147483647 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+.v0-action-bar-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+}
+
+.v0-action-bar button {
+  background: #0a66c2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.v0-action-bar button:hover {
+  background: #004182;
+}
+
+.v0-action-bar button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.v0-action-bar .count {
+  font-size: 12px;
+  color: #666;
+}
+
+/* Review panel */
+.v0-review-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 420px;
+  height: 100vh;
+  background: white;
+  box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.v0-review-panel.hidden {
+  display: none;
+}
+
+.v0-review-header {
+  padding: 16px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.v0-review-tabs {
+  display: flex;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.v0-tab {
+  flex: 1;
+  padding: 12px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 13px;
+  cursor: pointer;
+  color: #666;
+}
+
+.v0-tab:hover {
+  background: #f5f5f5;
+}
+
+.v0-tab.active {
+  color: #0a66c2;
+  border-bottom-color: #0a66c2;
+  font-weight: 500;
+}
+
+.v0-review-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.v0-review-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+}
+
+.v0-review-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.v0-review-item {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.v0-review-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.v0-review-item-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.v0-review-item-title {
+  font-size: 12px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.v0-review-item-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.v0-review-item-actions button {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.v0-review-item-actions button:hover {
+  background: #f0f0f0;
+}
+
+.v0-review-item-actions button.primary {
+  background: #0a66c2;
+  color: white;
+  border-color: #0a66c2;
+}
+
+.v0-review-item-actions button.primary:hover {
+  background: #004182;
+}
+
+.v0-review-item-dm {
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 8px;
+  margin-top: 8px;
+}
+
+.v0-review-item-dm[contenteditable="true"]:focus {
+  outline: 2px solid #0a66c2;
+  outline-offset: -2px;
+}
+
+.v0-review-item-status {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: #e0e0e0;
+}
+
+.v0-review-item-status.sent {
+  background: #d4edda;
+  color: #155724;
+}
+
+.v0-review-item-status.copied {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.v0-review-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  gap: 8px;
+}
+
+.v0-review-footer button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.v0-review-footer button.primary {
+  background: #0a66c2;
+  color: white;
+  border: none;
+}
+
+.v0-review-footer button.secondary {
+  background: white;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+/* Toast notifications */
+.v0-toast {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background: #333;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  z-index: 10001;
+  animation: v0-slide-up 0.3s ease;
+}
+
+@keyframes v0-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
