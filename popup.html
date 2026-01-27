@@ -164,7 +164,7 @@
   </style>
 </head>
 <body>
-  <h1>DM Buddy <span style="font-size: 11px; color: #999; font-weight: normal;">v1.2.0</span></h1>
+  <h1>DM Buddy <span style="font-size: 11px; color: #999; font-weight: normal;">v1.3.0</span></h1>
 
   <div class="settings">
     <div id="apiKeySection">
@@ -174,6 +174,32 @@
     <div id="apiKeySet" class="hidden">
       <span class="api-key-status">API key saved</span>
       <button type="button" id="changeKeyBtn" class="link-btn">change</button>
+    </div>
+
+    <label>Product</label>
+    <select id="product">
+      <option value="v0">v0</option>
+      <option value="vercel">Vercel</option>
+      <option value="vercel_ai">Vercel AI</option>
+      <option value="vercel_sandbox">Vercel Sandbox</option>
+      <option value="nextjs">Next.js on Vercel</option>
+      <optgroup label="Custom Products" id="customProductsGroup"></optgroup>
+      <option value="__add_new__">+ Add custom product</option>
+    </select>
+
+    <div id="customProductForm" class="hidden" style="background:#f0f0f0;padding:12px;border-radius:6px;margin-bottom:12px;">
+      <label>Product Name</label>
+      <input type="text" id="customProductName" placeholder="e.g. Acme CRM">
+      <label>One-liner (what it is)</label>
+      <input type="text" id="customProductOneliner" placeholder="e.g. AI-powered CRM for sales teams">
+      <label>Value Props (2-3 key benefits)</label>
+      <input type="text" id="customProductValue" placeholder="e.g. 2x faster deal cycles, automated follow-ups">
+      <label>Social Proof (optional)</label>
+      <input type="text" id="customProductProof" placeholder="e.g. Used by Stripe, Notion">
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button type="button" id="saveCustomProduct" style="flex:1;background:#057642;">Save Product</button>
+        <button type="button" id="cancelCustomProduct" style="flex:1;background:#666;">Cancel</button>
+      </div>
     </div>
 
     <label>Persona</label>
@@ -186,11 +212,21 @@
       <option value="security_leader">Security/CISO</option>
     </select>
 
+    <label>Tone</label>
+    <select id="tone">
+      <option value="relaxed">Relaxed</option>
+      <option value="friendly">Friendly</option>
+      <option value="professional">Professional</option>
+    </select>
+
     <label>Format</label>
     <select id="format">
       <option value="dm">LinkedIn DM (under 280 chars)</option>
       <option value="email">Cold Email (under 100 words)</option>
     </select>
+
+    <label>CTA (what you want them to do)</label>
+    <input type="text" id="cta" placeholder="e.g. book a quick call, worth exploring?, try it free">
 
     <label>Add this (optional)</label>
     <input type="text" id="addThis" placeholder="e.g. they just posted about hiring, mutual connection with John">
