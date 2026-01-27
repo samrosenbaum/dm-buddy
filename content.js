@@ -189,7 +189,10 @@ function extractFromCard(card) {
     title: '',
     company: '',
     headline: '',
-    about: ''
+    about: '',
+    timeInRole: '',
+    mutualConnections: '',
+    isNewInRole: false
   };
 
   // Debug: log the card's HTML structure
@@ -264,6 +267,25 @@ function extractFromCard(card) {
     if (aboutMatch) {
       data.about = aboutMatch[1].trim().substring(0, 300);
     }
+  }
+
+  // Time in role - look for patterns like "7 years 1 month in role" or "11 months in role"
+  const timeInRoleMatch = allText.match(/(\d+\s*(?:year|month|week|day)s?\s*(?:\d+\s*(?:year|month|week|day)s?)?\s*in role)/i);
+  if (timeInRoleMatch) {
+    data.timeInRole = timeInRoleMatch[1].trim();
+    // Check if they're new (less than 6 months)
+    const months = allText.match(/(\d+)\s*month/i);
+    const years = allText.match(/(\d+)\s*year/i);
+    const totalMonths = (years ? parseInt(years[1]) * 12 : 0) + (months ? parseInt(months[1]) : 0);
+    if (totalMonths <= 6 && !years) {
+      data.isNewInRole = true;
+    }
+  }
+
+  // Mutual connections - look for "1 mutual connection" or "4 mutual connections"
+  const mutualMatch = allText.match(/(\d+)\s*mutual\s*connections?/i);
+  if (mutualMatch) {
+    data.mutualConnections = mutualMatch[1];
   }
 
   console.log('[DM Buddy] Extracted data:', JSON.stringify(data));

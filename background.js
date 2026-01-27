@@ -135,15 +135,26 @@ async function generateDM(profileData, persona, addThis) {
   const promptKey = `${persona}_dm`;
   const systemPrompt = DM_PROMPTS[promptKey] || DM_PROMPTS.sales_leader_dm;
 
+  // Build personalization hints
+  const personalizationHints = [];
+  if (profileData.isNewInRole) {
+    personalizationHints.push(`They're NEW in this role (${profileData.timeInRole}) - consider a "congrats on the new role" opener`);
+  }
+  if (profileData.mutualConnections) {
+    personalizationHints.push(`You have ${profileData.mutualConnections} mutual connection(s) - consider mentioning this`);
+  }
+
   const userPrompt = `Write a LinkedIn DM for this person:
 
 Name: ${profileData.name}
 Title: ${profileData.title || 'Unknown'}
 Company: ${profileData.company || 'Unknown'}
+Time in role: ${profileData.timeInRole || 'Unknown'}
 About: ${profileData.about || 'Unknown'}
+${personalizationHints.length > 0 ? `\nPersonalization opportunities:\n- ${personalizationHints.join('\n- ')}` : ''}
 ${addThis ? `\nAdditional context to incorporate: ${addThis}` : ''}
 
-Start the message with "Hey ${profileData.name.split(' ')[0]}," and keep it under 280 characters.`;
+Start with "Hey ${profileData.name.split(' ')[0]}," - keep it to 2 sentences max, under 280 characters. Sound human, like texting a colleague.`;
 
   const response = await fetch('https://ai-gateway.vercel.sh/v1/messages', {
     method: 'POST',
