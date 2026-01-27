@@ -698,24 +698,66 @@ function extractProfileData() {
     if (aboutEl) data.about = aboutEl.textContent.trim().substring(0, 500);
 
   } else {
-    // Regular LinkedIn
-    const nameEl = document.querySelector('h1.text-heading-xlarge') || document.querySelector('h1');
+    // Regular LinkedIn - try multiple selector patterns (LinkedIn changes these often)
+
+    // Name - try multiple patterns
+    const nameEl = document.querySelector('h1.text-heading-xlarge') ||
+                   document.querySelector('h1.inline.t-24') ||
+                   document.querySelector('h1');
     if (nameEl) data.name = nameEl.textContent.trim().split('\n')[0].trim();
 
-    const headlineEl = document.querySelector('.text-body-medium.break-words');
-    if (headlineEl) data.headline = headlineEl.textContent.trim();
+    // Headline - the line under the name (usually "Title at Company")
+    const headlineEl = document.querySelector('.text-body-medium.break-words') ||
+                       document.querySelector('div.text-body-medium') ||
+                       document.querySelector('[data-generated-suggestion-target]');
+    if (headlineEl) {
+      data.headline = headlineEl.textContent.trim();
+    }
 
-    const titleEl = document.querySelector('.pv-top-card--experience-list-item');
-    if (titleEl) data.title = titleEl.textContent.trim();
+    // Try to get title/company from experience section first
+    const experienceSection = document.querySelector('#experience') ||
+                              document.querySelector('[id^="profilePagedListComponent"]');
+    if (experienceSection) {
+      // Look for the first experience item
+      const firstExp = experienceSection.querySelector('li') ||
+                       experienceSection.closest('section')?.querySelector('li');
+      if (firstExp) {
+        const expTitle = firstExp.querySelector('span[aria-hidden="true"]');
+        const expCompany = firstExp.querySelector('a[href*="/company/"]');
+        if (expTitle && !data.title) data.title = expTitle.textContent.trim().split('\n')[0];
+        if (expCompany && !data.company) data.company = expCompany.textContent.trim();
+      }
+    }
 
-    const companyEl = document.querySelector('.pv-top-card--experience-list-item a[href*="/company/"]');
-    if (companyEl) data.company = companyEl.textContent.trim();
+    // Fallback: parse headline "Title at Company" or "Title | Company"
+    if ((!data.title || !data.company) && data.headline) {
+      const atMatch = data.headline.match(/^(.+?)\s+at\s+(.+?)(?:\s*·|$)/i);
+      const pipeMatch = data.headline.match(/^(.+?)\s*\|\s*(.+?)(?:\s*·|$)/i);
 
-    const locationEl = document.querySelector('.text-body-small.inline.t-black--light.break-words');
+      if (atMatch) {
+        if (!data.title) data.title = atMatch[1].trim();
+        if (!data.company) data.company = atMatch[2].trim();
+      } else if (pipeMatch) {
+        if (!data.title) data.title = pipeMatch[1].trim();
+        if (!data.company) data.company = pipeMatch[2].trim();
+      } else if (!data.title) {
+        // Just use headline as title if we can't parse it
+        data.title = data.headline.split('·')[0].trim();
+      }
+    }
+
+    // Location
+    const locationEl = document.querySelector('.text-body-small.inline.t-black--light.break-words') ||
+                       document.querySelector('span.text-body-small[class*="t-black--light"]');
     if (locationEl) data.location = locationEl.textContent.trim();
 
-    const aboutEl = document.querySelector('#about ~ .display-flex .inline-show-more-text');
-    if (aboutEl) data.about = aboutEl.textContent.trim().substring(0, 500);
+    // About section
+    const aboutSection = document.querySelector('#about');
+    if (aboutSection) {
+      const aboutText = aboutSection.closest('section')?.querySelector('.inline-show-more-text') ||
+                        aboutSection.closest('section')?.querySelector('span[aria-hidden="true"]');
+      if (aboutText) data.about = aboutText.textContent.trim().substring(0, 500);
+    }
   }
 
   return data;
