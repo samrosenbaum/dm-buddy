@@ -643,16 +643,29 @@ function extractProfileData() {
   const isSalesNav = window.location.href.includes('/sales/');
 
   if (isSalesNav) {
-    // Sales Navigator profile page
-    const nameEl = document.querySelector('[data-x--lead--name]') ||
-                   document.querySelector('.profile-topcard-person-entity__name') ||
-                   document.querySelector('h1 span[data-anonymize="person-name"]') ||
-                   document.querySelector('.artdeco-entity-lockup__title span');
+    // Sales Navigator profile page - try many selector patterns
 
-    if (nameEl) {
-      let name = nameEl.textContent.trim().split('\n')[0].trim();
-      if (!name.includes('Sales Navigator') && !name.includes('Lead Page')) {
-        data.name = name;
+    // Name - multiple fallbacks
+    const nameSelectors = [
+      '[data-x--lead--name]',
+      '.profile-topcard-person-entity__name',
+      'h1 span[data-anonymize="person-name"]',
+      '.artdeco-entity-lockup__title span',
+      '.profile-topcard__name',
+      '[data-anonymize="person-name"]',
+      '.lead-card__name',
+      'h1.profile-topcard-person-entity__name',
+      '.topcard-hovercard-meta__name'
+    ];
+
+    for (const selector of nameSelectors) {
+      const el = document.querySelector(selector);
+      if (el) {
+        let name = el.textContent.trim().split('\n')[0].trim();
+        if (name && !name.includes('Sales Navigator') && !name.includes('Lead Page')) {
+          data.name = name;
+          break;
+        }
       }
     }
 
@@ -664,38 +677,123 @@ function extractProfileData() {
       }
     }
 
-    // Headline
-    const headlineEl = document.querySelector('.profile-topcard__summary-headline') ||
-                       document.querySelector('[data-anonymize="headline"]');
-    if (headlineEl) {
-      data.headline = headlineEl.textContent.trim();
-    }
+    // Headline - multiple fallbacks
+    const headlineSelectors = [
+      '.profile-topcard__summary-headline',
+      '[data-anonymize="headline"]',
+      '.profile-topcard__headline',
+      '.profile-topcard-person-entity__headline',
+      '.lead-card__headline'
+    ];
 
-    // Current role
-    const currentRoleEl = document.querySelector('.profile-topcard__current-positions');
-    if (currentRoleEl) {
-      const roleTitle = currentRoleEl.querySelector('.profile-topcard__summary-position-title');
-      const roleCompany = currentRoleEl.querySelector('a[href*="/company/"]');
-      if (roleTitle) data.title = roleTitle.textContent.trim();
-      if (roleCompany) data.company = roleCompany.textContent.trim();
-    }
-
-    // Fallback from headline
-    if ((!data.title || !data.company) && data.headline) {
-      const parts = data.headline.split(/\s+at\s+|\s+·\s+|\s+\|\s+/);
-      if (parts.length >= 2) {
-        if (!data.title) data.title = parts[0].trim();
-        if (!data.company) data.company = parts[parts.length - 1].trim();
+    for (const selector of headlineSelectors) {
+      const el = document.querySelector(selector);
+      if (el) {
+        data.headline = el.textContent.trim();
+        break;
       }
     }
 
-    // Location
-    const locationEl = document.querySelector('.profile-topcard__location-data');
-    if (locationEl) data.location = locationEl.textContent.trim();
+    // Title and Company - try multiple approaches
 
-    // About
-    const aboutEl = document.querySelector('.profile-topcard__summary-content');
-    if (aboutEl) data.about = aboutEl.textContent.trim().substring(0, 500);
+    // Approach 1: Current positions section
+    const positionSelectors = [
+      '.profile-topcard__current-positions',
+      '.profile-topcard__position-info',
+      '.profile-topcard-person-entity__position'
+    ];
+
+    for (const selector of positionSelectors) {
+      const posEl = document.querySelector(selector);
+      if (posEl) {
+        // Look for title
+        const titleEl = posEl.querySelector('.profile-topcard__summary-position-title') ||
+                        posEl.querySelector('[data-anonymize="title"]') ||
+                        posEl.querySelector('.profile-topcard__position-title') ||
+                        posEl.querySelector('span[data-anonymize="job-title"]');
+        if (titleEl && !data.title) {
+          data.title = titleEl.textContent.trim();
+        }
+
+        // Look for company
+        const companyEl = posEl.querySelector('a[href*="/company/"]') ||
+                          posEl.querySelector('[data-anonymize="company-name"]') ||
+                          posEl.querySelector('.profile-topcard__summary-position-company');
+        if (companyEl && !data.company) {
+          data.company = companyEl.textContent.trim();
+        }
+
+        if (data.title && data.company) break;
+      }
+    }
+
+    // Approach 2: Look for any company link on the page
+    if (!data.company) {
+      const companyLink = document.querySelector('.profile-topcard a[href*="/company/"]') ||
+                          document.querySelector('[data-anonymize="company-name"]');
+      if (companyLink) {
+        data.company = companyLink.textContent.trim();
+      }
+    }
+
+    // Approach 3: Look for title/company in any data-anonymize elements
+    if (!data.title) {
+      const titleEl = document.querySelector('[data-anonymize="title"]') ||
+                      document.querySelector('[data-anonymize="job-title"]');
+      if (titleEl) data.title = titleEl.textContent.trim();
+    }
+
+    // Approach 4: Parse headline "Title at Company" patterns
+    if ((!data.title || !data.company) && data.headline) {
+      // Try "at" pattern: "VP Sales at Acme Corp"
+      const atMatch = data.headline.match(/^(.+?)\s+at\s+(.+?)(?:\s*[·|,]|$)/i);
+      // Try pipe pattern: "VP Sales | Acme Corp"
+      const pipeMatch = data.headline.match(/^(.+?)\s*\|\s*(.+?)(?:\s*[·,]|$)/i);
+      // Try comma pattern: "VP Sales, Acme Corp"
+      const commaMatch = data.headline.match(/^(.+?),\s*(.+?)(?:\s*[·|]|$)/i);
+      // Try dash pattern: "VP Sales - Acme Corp"
+      const dashMatch = data.headline.match(/^(.+?)\s*[-–—]\s*(.+?)(?:\s*[·|,]|$)/i);
+
+      const match = atMatch || pipeMatch || commaMatch || dashMatch;
+      if (match) {
+        if (!data.title) data.title = match[1].trim();
+        if (!data.company) data.company = match[2].trim();
+      } else if (!data.title && data.headline) {
+        // Just use first part of headline as title
+        data.title = data.headline.split(/[·|,]/)[0].trim();
+      }
+    }
+
+    // Location - multiple fallbacks
+    const locationSelectors = [
+      '.profile-topcard__location-data',
+      '[data-anonymize="location"]',
+      '.profile-topcard__location',
+      '.profile-topcard-person-entity__location'
+    ];
+
+    for (const selector of locationSelectors) {
+      const el = document.querySelector(selector);
+      if (el) {
+        data.location = el.textContent.trim();
+        break;
+      }
+    }
+
+    // About - multiple fallbacks
+    const aboutSelectors = [
+      '.profile-topcard__summary-content',
+      '.profile-topcard__summary',
+      '[data-anonymize="summary"]'
+    ];
+
+    for (const selector of aboutSelectors) {
+      const el = document.querySelector(selector);
+      if (el) {
+        data.about = el.textContent.trim().substring(0, 500);
+        break;
+      }
+    }
 
   } else {
     // Regular LinkedIn - try multiple selector patterns (LinkedIn changes these often)
@@ -703,27 +801,39 @@ function extractProfileData() {
     // Name - try multiple patterns
     const nameEl = document.querySelector('h1.text-heading-xlarge') ||
                    document.querySelector('h1.inline.t-24') ||
+                   document.querySelector('.pv-top-card--list h1') ||
                    document.querySelector('h1');
     if (nameEl) data.name = nameEl.textContent.trim().split('\n')[0].trim();
 
     // Headline - the line under the name (usually "Title at Company")
-    const headlineEl = document.querySelector('.text-body-medium.break-words') ||
-                       document.querySelector('div.text-body-medium') ||
-                       document.querySelector('[data-generated-suggestion-target]');
-    if (headlineEl) {
-      data.headline = headlineEl.textContent.trim();
+    const headlineSelectors = [
+      '.text-body-medium.break-words',
+      'div.text-body-medium',
+      '.pv-top-card--list .text-body-medium',
+      '[data-generated-suggestion-target]',
+      '.pv-text-details__left-panel .text-body-medium'
+    ];
+
+    for (const selector of headlineSelectors) {
+      const el = document.querySelector(selector);
+      if (el) {
+        data.headline = el.textContent.trim();
+        break;
+      }
     }
 
     // Try to get title/company from experience section first
     const experienceSection = document.querySelector('#experience') ||
-                              document.querySelector('[id^="profilePagedListComponent"]');
+                              document.querySelector('[id^="profilePagedListComponent"]') ||
+                              document.querySelector('section[data-section="experience"]');
     if (experienceSection) {
-      // Look for the first experience item
-      const firstExp = experienceSection.querySelector('li') ||
-                       experienceSection.closest('section')?.querySelector('li');
+      const section = experienceSection.closest('section') || experienceSection;
+      const firstExp = section.querySelector('li');
       if (firstExp) {
-        const expTitle = firstExp.querySelector('span[aria-hidden="true"]');
-        const expCompany = firstExp.querySelector('a[href*="/company/"]');
+        const expTitle = firstExp.querySelector('span[aria-hidden="true"]') ||
+                         firstExp.querySelector('.t-bold span');
+        const expCompany = firstExp.querySelector('a[href*="/company/"]') ||
+                           firstExp.querySelector('.t-normal span[aria-hidden="true"]');
         if (expTitle && !data.title) data.title = expTitle.textContent.trim().split('\n')[0];
         if (expCompany && !data.company) data.company = expCompany.textContent.trim();
       }
@@ -731,31 +841,34 @@ function extractProfileData() {
 
     // Fallback: parse headline "Title at Company" or "Title | Company"
     if ((!data.title || !data.company) && data.headline) {
-      const atMatch = data.headline.match(/^(.+?)\s+at\s+(.+?)(?:\s*·|$)/i);
-      const pipeMatch = data.headline.match(/^(.+?)\s*\|\s*(.+?)(?:\s*·|$)/i);
+      const atMatch = data.headline.match(/^(.+?)\s+at\s+(.+?)(?:\s*[·|,]|$)/i);
+      const pipeMatch = data.headline.match(/^(.+?)\s*\|\s*(.+?)(?:\s*[·,]|$)/i);
+      const commaMatch = data.headline.match(/^(.+?),\s*(.+?)(?:\s*[·|]|$)/i);
+      const dashMatch = data.headline.match(/^(.+?)\s*[-–—]\s*(.+?)(?:\s*[·|,]|$)/i);
 
-      if (atMatch) {
-        if (!data.title) data.title = atMatch[1].trim();
-        if (!data.company) data.company = atMatch[2].trim();
-      } else if (pipeMatch) {
-        if (!data.title) data.title = pipeMatch[1].trim();
-        if (!data.company) data.company = pipeMatch[2].trim();
+      const match = atMatch || pipeMatch || commaMatch || dashMatch;
+      if (match) {
+        if (!data.title) data.title = match[1].trim();
+        if (!data.company) data.company = match[2].trim();
       } else if (!data.title) {
         // Just use headline as title if we can't parse it
-        data.title = data.headline.split('·')[0].trim();
+        data.title = data.headline.split(/[·|,]/)[0].trim();
       }
     }
 
     // Location
     const locationEl = document.querySelector('.text-body-small.inline.t-black--light.break-words') ||
-                       document.querySelector('span.text-body-small[class*="t-black--light"]');
+                       document.querySelector('span.text-body-small[class*="t-black--light"]') ||
+                       document.querySelector('.pv-top-card--list .text-body-small');
     if (locationEl) data.location = locationEl.textContent.trim();
 
     // About section
     const aboutSection = document.querySelector('#about');
     if (aboutSection) {
-      const aboutText = aboutSection.closest('section')?.querySelector('.inline-show-more-text') ||
-                        aboutSection.closest('section')?.querySelector('span[aria-hidden="true"]');
+      const section = aboutSection.closest('section');
+      const aboutText = section?.querySelector('.inline-show-more-text') ||
+                        section?.querySelector('span[aria-hidden="true"]') ||
+                        section?.querySelector('.pv-shared-text-with-see-more span');
       if (aboutText) data.about = aboutText.textContent.trim().substring(0, 500);
     }
   }
