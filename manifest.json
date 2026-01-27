@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "v0 LinkedIn DM Writer",
+  "name": "DM Buddy",
   "version": "1.1",
   "description": "Generate personalized LinkedIn DMs for v0 sales outreach",
   "permissions": [

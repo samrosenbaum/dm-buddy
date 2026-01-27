@@ -1,6 +1,6 @@
-# v0 LinkedIn DM Writer
+# DM Buddy
 
-Chrome extension that generates personalized LinkedIn DMs for v0 sales outreach using AI.
+Chrome extension that generates personalized LinkedIn DMs for sales outreach using AI.
 
 ## Features
 

@@ -1,5 +1,5 @@
 // v0 LinkedIn DM Writer - Content Script (Agentic Version)
-console.log('[v0 DM Writer] Content script loaded on:', window.location.href);
+console.log('[DM Buddy] Content script loaded on:', window.location.href);
 
 let reviewQueue = [];
 let completedQueue = [];
@@ -30,9 +30,9 @@ async function saveQueues() {
 
 // Move item to completed
 function moveToCompleted(index) {
-  console.log('[v0 DM Writer] Moving item', index, 'to completed. Queue length:', reviewQueue.length);
+  console.log('[DM Buddy] Moving item', index, 'to completed. Queue length:', reviewQueue.length);
   if (index < 0 || index >= reviewQueue.length) {
-    console.log('[v0 DM Writer] Invalid index');
+    console.log('[DM Buddy] Invalid index');
     return;
   }
   const item = reviewQueue.splice(index, 1)[0];
@@ -42,7 +42,7 @@ function moveToCompleted(index) {
   if (completedQueue.length > 50) {
     completedQueue = completedQueue.slice(0, 50);
   }
-  console.log('[v0 DM Writer] After move - Ready:', reviewQueue.length, 'Completed:', completedQueue.length);
+  console.log('[DM Buddy] After move - Ready:', reviewQueue.length, 'Completed:', completedQueue.length);
   saveQueues();
   updateQueueCount();
 }
@@ -71,7 +71,7 @@ function init() {
   }
 
   // On list view, inject UI - try immediately and again after delay
-  console.log('[v0 DM Writer] List view detected, injecting UI...');
+  console.log('[DM Buddy] List view detected, injecting UI...');
   injectActionBar();
 
   setTimeout(() => {
@@ -88,11 +88,11 @@ function init() {
 // Inject floating action bar
 function injectActionBar() {
   if (document.querySelector('.v0-action-bar')) {
-    console.log('[v0 DM Writer] Action bar already exists');
+    console.log('[DM Buddy] Action bar already exists');
     return;
   }
 
-  console.log('[v0 DM Writer] Injecting action bar...');
+  console.log('[DM Buddy] Injecting action bar...');
 
   const bar = document.createElement('div');
   bar.className = 'v0-action-bar';
@@ -106,7 +106,7 @@ function injectActionBar() {
   `;
 
   document.body.appendChild(bar);
-  console.log('[v0 DM Writer] Action bar injected');
+  console.log('[DM Buddy] Action bar injected');
 
   document.getElementById('v0-scan-new').addEventListener('click', () => {
     injectButtonsIntoList();
@@ -123,7 +123,7 @@ function injectButtonsIntoList() {
   // Each result has a link to /sales/lead/ or /sales/people/
   const allLinks = document.querySelectorAll('a[href*="/sales/lead/"], a[href*="/sales/people/"]');
 
-  console.log(`[v0 DM Writer] Found ${allLinks.length} profile links`);
+  console.log(`[DM Buddy] Found ${allLinks.length} profile links`);
 
   let injectedCount = 0;
   const processedCards = new Set();
@@ -145,7 +145,7 @@ function injectButtonsIntoList() {
     if (actionArea) {
       const btn = document.createElement('button');
       btn.className = 'v0-dm-btn';
-      btn.textContent = 'v0 DM';
+      btn.textContent = 'DM';
       btn.style.marginLeft = '8px';
       btn.addEventListener('click', (e) => {
         e.preventDefault();
@@ -157,7 +157,7 @@ function injectButtonsIntoList() {
     }
   });
 
-  console.log(`[v0 DM Writer] Injected ${injectedCount} new buttons`);
+  console.log(`[DM Buddy] Injected ${injectedCount} new buttons`);
 }
 
 // Watch for new cards loaded via infinite scroll
@@ -193,7 +193,7 @@ function extractFromCard(card) {
   };
 
   // Debug: log the card's HTML structure
-  console.log('[v0 DM Writer] Extracting from card:', card);
+  console.log('[DM Buddy] Extracting from card:', card);
 
   // Name - try multiple approaches
   // Look for the main name link first
@@ -266,7 +266,7 @@ function extractFromCard(card) {
     }
   }
 
-  console.log('[v0 DM Writer] Extracted data:', JSON.stringify(data));
+  console.log('[DM Buddy] Extracted data:', JSON.stringify(data));
   return data;
 }
 
@@ -312,7 +312,7 @@ async function generateForCard(card, btn) {
     btn.classList.remove('loading');
     showToast('Error: ' + error.message);
     setTimeout(() => {
-      btn.textContent = 'v0 DM';
+      btn.textContent = 'DM';
       btn.classList.remove('done');
     }, 2000);
   }
@@ -577,7 +577,7 @@ function clearQueue() {
     reviewQueue = [];
     // Reset all buttons
     document.querySelectorAll('.v0-dm-btn.done').forEach(btn => {
-      btn.textContent = 'v0 DM';
+      btn.textContent = 'DM';
       btn.classList.remove('done');
     });
     showToast('Ready queue cleared');
