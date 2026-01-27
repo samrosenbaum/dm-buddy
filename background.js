@@ -113,13 +113,6 @@ Rules:
 }
 
 async function generateDM(profileData, productKey, tone, cta, addThis) {
-  const stored = await chrome.storage.local.get(['claudeApiKey']);
-  const apiKey = stored.claudeApiKey;
-
-  if (!apiKey) {
-    throw new Error('API key not set. Open the extension popup to set it.');
-  }
-
   // Get product data
   const product = await getProductData(productKey || 'v0');
   const systemPrompt = buildPrompt(product, profileData.title, tone || 'relaxed', cta);
@@ -145,12 +138,10 @@ ${addThis ? `\nContext to weave in: ${addThis}` : ''}
 
 Start with "Hey ${profileData.name.split(' ')[0]}," - keep it natural and brief.`;
 
-  const response = await fetch('https://ai-gateway.vercel.sh/v1/messages', {
+  const response = await fetch('https://dm-buddy-api.vercel.app/api/generate', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-      'anthropic-version': '2023-06-01'
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',

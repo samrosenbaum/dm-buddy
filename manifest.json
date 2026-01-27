@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "DM Buddy",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Generate personalized LinkedIn DMs for v0 sales outreach",
   "permissions": [
     "activeTab",
@@ -9,7 +9,7 @@
   ],
   "host_permissions": [
     "https://www.linkedin.com/*",
-    "https://ai-gateway.vercel.sh/*"
+    "https://dm-buddy-api.vercel.app/*"
   ],
   "action": {
     "default_popup": "popup.html",

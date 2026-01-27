@@ -64,14 +64,7 @@ let customProducts = {};
 
 // Load saved settings and custom products
 document.addEventListener('DOMContentLoaded', async () => {
-  const stored = await chrome.storage.local.get(['claudeApiKey', 'customProducts', 'selectedProduct', 'selectedTone', 'selectedCta']);
-
-  // API key
-  if (stored.claudeApiKey) {
-    document.getElementById('apiKey').value = stored.claudeApiKey;
-    document.getElementById('apiKeySection').classList.add('hidden');
-    document.getElementById('apiKeySet').classList.remove('hidden');
-  }
+  const stored = await chrome.storage.local.get(['customProducts', 'selectedProduct', 'selectedTone', 'selectedCta']);
 
   // Custom products
   if (stored.customProducts) {
@@ -203,22 +196,6 @@ document.getElementById('cancelCustomProduct').addEventListener('click', () => {
   document.getElementById('customProductForm').classList.add('hidden');
 });
 
-// Save API key when changed
-document.getElementById('apiKey').addEventListener('change', async (e) => {
-  await chrome.storage.local.set({ claudeApiKey: e.target.value });
-  if (e.target.value) {
-    document.getElementById('apiKeySection').classList.add('hidden');
-    document.getElementById('apiKeySet').classList.remove('hidden');
-  }
-});
-
-// Show API key input when "change" is clicked
-document.getElementById('changeKeyBtn').addEventListener('click', () => {
-  document.getElementById('apiKeySection').classList.remove('hidden');
-  document.getElementById('apiKeySet').classList.add('hidden');
-  document.getElementById('apiKey').focus();
-});
-
 // Save tone selection
 document.getElementById('tone').addEventListener('change', async (e) => {
   await chrome.storage.local.set({ selectedTone: e.target.value });
@@ -300,7 +277,6 @@ Rules:
 
 // Generate DM
 document.getElementById('generateBtn').addEventListener('click', async () => {
-  const apiKey = document.getElementById('apiKey').value;
   const productKey = document.getElementById('product').value;
   const tone = document.getElementById('tone').value;
   const cta = document.getElementById('cta').value;
@@ -309,11 +285,6 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
   const message = document.getElementById('message');
   const generateBtn = document.getElementById('generateBtn');
   const copyBtn = document.getElementById('copyBtn');
-
-  if (!apiKey) {
-    message.innerHTML = '<div class="error">Please enter your Gateway key</div>';
-    return;
-  }
 
   if (!profileData.name) {
     message.innerHTML = '<div class="error">Could not read profile data</div>';
@@ -344,12 +315,10 @@ ${addThis ? `\nContext to weave in: ${addThis}` : ''}
 Start with "Hey ${profileData.name.split(' ')[0]}," - keep it natural and brief.`;
 
   try {
-    const response = await fetch('https://ai-gateway.vercel.sh/v1/messages', {
+    const response = await fetch('https://dm-buddy-api.vercel.app/api/generate', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'anthropic-version': '2023-06-01'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
