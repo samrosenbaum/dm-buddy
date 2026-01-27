@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "DM Buddy",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Generate personalized LinkedIn DMs for v0 sales outreach",
   "permissions": [
     "activeTab",

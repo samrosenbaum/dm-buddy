@@ -5,7 +5,6 @@ let reviewQueue = [];
 let completedQueue = [];
 let settings = {
   product: 'v0',
-  persona: 'sales_leader',
   tone: 'relaxed',
   cta: '',
   addThis: ''
@@ -53,9 +52,8 @@ function moveToCompleted(index) {
 // Initialize when page loads
 function init() {
   // Load settings and queues
-  chrome.storage.local.get(['selectedProduct', 'v0_persona', 'selectedTone', 'selectedCta', 'v0_addThis'], (result) => {
+  chrome.storage.local.get(['selectedProduct', 'selectedTone', 'selectedCta', 'v0_addThis'], (result) => {
     if (result.selectedProduct) settings.product = result.selectedProduct;
-    if (result.v0_persona) settings.persona = result.v0_persona;
     if (result.selectedTone) settings.tone = result.selectedTone;
     if (result.selectedCta) settings.cta = result.selectedCta;
     if (result.v0_addThis) settings.addThis = result.v0_addThis;
@@ -315,7 +313,6 @@ async function generateForCard(card, btn) {
       action: 'generateDM',
       profileData,
       product: settings.product,
-      persona: settings.persona,
       tone: settings.tone,
       cta: settings.cta,
       addThis: settings.addThis
@@ -730,13 +727,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse(extractProfileData());
   } else if (request.action === 'updateSettings') {
     settings.product = request.product || settings.product;
-    settings.persona = request.persona || settings.persona;
     settings.tone = request.tone || settings.tone;
     settings.cta = request.cta || '';
     settings.addThis = request.addThis || '';
     chrome.storage.local.set({
       selectedProduct: settings.product,
-      v0_persona: settings.persona,
       selectedTone: settings.tone,
       selectedCta: settings.cta,
       v0_addThis: settings.addThis
