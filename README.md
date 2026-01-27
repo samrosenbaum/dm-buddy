@@ -15,7 +15,7 @@ Chrome extension that generates personalized LinkedIn DMs for sales outreach usi
 
 1. Clone this repo:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/linkedin-dm-extension.git
+   git clone https://github.com/samrosenbaum/dm-buddy.git
    ```
 
 2. Open Chrome and go to `chrome://extensions/`
