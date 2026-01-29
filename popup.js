@@ -39,6 +39,31 @@ const TONE_INSTRUCTIONS = {
   professional: 'Use a polished, business-appropriate tone. Be direct and respect their time. No fluff.'
 };
 
+// Opener styles for variety
+const OPENER_STYLES = [
+  { style: 'observation', instruction: 'Start with a specific observation about their company or role, then connect to the product.' },
+  { style: 'question', instruction: 'Start with a genuine question about a challenge their role likely faces, then bridge to the product.' },
+  { style: 'direct', instruction: 'Get straight to the point with why you\'re reaching out. No fluff opener.' },
+  { style: 'curiosity', instruction: 'Lead with something interesting or counterintuitive that would make them want to read more.' },
+  { style: 'mutual-ground', instruction: 'Find common ground first (industry, shared challenge, trend) before mentioning the product.' },
+  { style: 'compliment', instruction: 'Start with genuine recognition of something specific about their work or company, then transition naturally.' }
+];
+
+// Message angles for variety
+const MESSAGE_ANGLES = [
+  { angle: 'pain-point', instruction: 'Focus on a specific pain point their role experiences and how this solves it.' },
+  { angle: 'opportunity', instruction: 'Frame it as an opportunity they might be missing rather than a problem to fix.' },
+  { angle: 'social-proof', instruction: 'Lead with what similar companies/roles are doing, creating peer relevance.' },
+  { angle: 'trend', instruction: 'Connect to a broader industry trend they\'re likely aware of.' },
+  { angle: 'efficiency', instruction: 'Focus on time/resource savings without being salesy about it.' },
+  { angle: 'competitive', instruction: 'Subtly hint at competitive advantage without being aggressive.' }
+];
+
+// Get random item from array
+function getRandomItem(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
 // Auto-detect persona from title
 function detectPersona(title) {
   if (!title) return 'leader';
@@ -238,13 +263,17 @@ function getProductData(productKey) {
   return PRODUCT_PRESETS[productKey];
 }
 
-// Build dynamic prompt
+// Build dynamic prompt with variety
 function buildPrompt(productKey, title, tone, cta, format) {
   const product = getProductData(productKey);
   if (!product) return null;
 
   const detectedPersona = detectPersona(title);
   const toneInstructions = TONE_INSTRUCTIONS[tone];
+
+  // Select random opener style and message angle for variety
+  const opener = getRandomItem(OPENER_STYLES);
+  const angle = getRandomItem(MESSAGE_ANGLES);
 
   const formatInstructions = format === 'dm'
     ? 'Write a LinkedIn DM (under 280 characters)'
@@ -262,6 +291,10 @@ Key value: ${product.valueProps}
 
 ${product.socialProof ? `Social proof: ${product.socialProof}` : ''}
 
+OPENER STYLE (${opener.style}): ${opener.instruction}
+
+MESSAGE ANGLE (${angle.angle}): ${angle.instruction}
+
 ${ctaInstruction}
 
 Tone: ${toneInstructions}
@@ -272,7 +305,8 @@ Rules:
 - Sound human, like texting a colleague you met at a conference
 - Reference their specific role/company naturally
 - Do not make up metrics or claims
-- Do not be salesy or pushy`;
+- Do not be salesy or pushy
+- IMPORTANT: Make this message feel unique. Vary sentence structure, word choice, and flow. Avoid formulaic patterns.`;
 }
 
 // Generate DM
@@ -304,6 +338,18 @@ document.getElementById('generateBtn').addEventListener('click', async () => {
   message.innerHTML = '';
 
   const addThis = document.getElementById('addThis').value.trim();
+  const firstName = profileData.name.split(' ')[0];
+
+  // Vary the greeting instruction
+  const greetingStyles = [
+    `Start with "Hey ${firstName}," then dive in.`,
+    `Start with "${firstName}," (just their name) and get to the point.`,
+    `Start with "Hi ${firstName}" and keep it conversational.`,
+    `Open with "${firstName}, quick question:" or similar.`,
+    `Start casually with "${firstName}," and a direct observation.`
+  ];
+  const greetingInstruction = greetingStyles[Math.floor(Math.random() * greetingStyles.length)];
+
   const userPrompt = `Write a DM for:
 
 Name: ${profileData.name}
@@ -312,7 +358,7 @@ Company: ${profileData.company || 'Unknown'}
 ${profileData.about ? `About: ${profileData.about.substring(0, 200)}` : ''}
 ${addThis ? `\nContext to weave in: ${addThis}` : ''}
 
-Start with "Hey ${profileData.name.split(' ')[0]}," - keep it natural and brief.`;
+${greetingInstruction} Keep it natural and brief.`;
 
   try {
     const response = await fetch('https://dm-buddy-api.vercel.app/api/generate', {
