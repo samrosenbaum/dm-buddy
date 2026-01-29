@@ -184,11 +184,11 @@ async function generateDM(profileData, productKey, tone, cta, addThis) {
 
   const userPrompt = `Write a DM for:
 
-Name: ${profileData.name}
-Title: ${profileData.title || 'Unknown'}
-Company: ${profileData.company || 'Unknown'}
-${profileData.timeInRole ? `Time in role: ${profileData.timeInRole}` : ''}
-${profileData.about ? `About: ${profileData.about.substring(0, 200)}` : ''}
+Name: ${profileData?.name || 'Unknown'}
+Title: ${profileData?.title || 'Unknown'}
+Company: ${profileData?.company || 'Unknown'}
+${profileData?.timeInRole ? `Time in role: ${profileData.timeInRole}` : ''}
+${profileData?.about ? `About: ${profileData.about.substring(0, 200)}` : ''}
 ${personalizationHints.length > 0 ? `\nPersonalization opportunities:\n- ${personalizationHints.join('\n- ')}` : ''}
 ${addThis ? `\nContext to weave in: ${addThis}` : ''}
 
