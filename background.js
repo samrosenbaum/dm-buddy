@@ -149,9 +149,9 @@ Rules:
 async function generateDM(profileData, productKey, tone, cta, addThis) {
   // Get product data
   const product = await getProductData(productKey || 'v0');
-  const systemPrompt = buildPrompt(product, profileData.title, tone || 'relaxed', cta);
+  const systemPrompt = buildPrompt(product, profileData?.title, tone || 'relaxed', cta);
 
-  const firstName = profileData.name.split(' ')[0];
+  const firstName = profileData?.name ? profileData.name.split(' ')[0] : 'there';
 
   // Build personalization hints with more variety
   const personalizationHints = [];
